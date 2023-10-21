@@ -5,14 +5,19 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(cors());
+// app.use(cors());
+// app.use(express.json());
 app.use(express.json());
-
+const corsConfig = {
+  origin: "*",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+};
+app.use(cors(corsConfig))
 
 
 const uri = `mongodb+srv://${process.env.db_USER}:${process.env.db_PASS}@cluster0.jv3edzu.mongodb.net/?retryWrites=true&w=majority`;
 console.log(uri)
-
 
 
 const client = new MongoClient(uri, {
@@ -25,8 +30,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    
 
     const brandCollection = client.db('brandDB').collection('brand');
     const userCollection = client.db('brandDB').collection('user');
@@ -62,6 +66,7 @@ async function run() {
           brandname:updatedProduct.brandname, 
           choose:updatedProduct.choose, 
           price:updatedProduct.price, 
+          rating:updatedProduct.rating, 
           description:updatedProduct.description, 
           photo:updatedProduct.photo,
         }
@@ -110,8 +115,6 @@ async function run() {
       res.send(result);
     })
 
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
